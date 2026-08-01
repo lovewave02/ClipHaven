@@ -1,0 +1,14 @@
+.DS_Store
+
+# Swift Package Manager build products
+.build/
+
+# Locally packaged application output
+dist/
+
+# Xcode per-user and transient workspace data
+DerivedData/
+*.xcuserstate
+*.xcuserdata/
+*.xcscmblueprint
+*.xccheckout
