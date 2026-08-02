@@ -7,7 +7,6 @@ struct ClipSettings: Codable, Sendable {
     static let ordinaryLimit = 750
     var isPaused = false
     var autoPaste = false
-    var launchAtLogin = false
     var excludedBundleIDs: Set<String> = []
 }
 
@@ -40,7 +39,7 @@ final class HistoryStore {
         if let newest = items.first, newest.payload == payload {
             items[0].capturedAt = now
         } else {
-            items.insert(HistoryItem(payload: payload, capturedAt: now), at: 0)
+            items.insert(HistoryItem(payload: payload, capturedAt: now, sourceBundleIdentifier: frontmostBundleID), at: 0)
         }
         sweepRetention(now: now)
         trimOrdinaryEntries()
@@ -50,6 +49,16 @@ final class HistoryStore {
     func togglePin(_ id: UUID) {
         guard let index = items.firstIndex(where: { $0.id == id }) else { return }
         items[index].isPinned.toggle()
+        save()
+    }
+
+    func setPaused(_ isPaused: Bool) {
+        settings.isPaused = isPaused
+        save()
+    }
+
+    func setAutoPaste(_ enabled: Bool) {
+        settings.autoPaste = enabled
         save()
     }
 

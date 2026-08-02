@@ -41,11 +41,13 @@ struct HistoryItem: Codable, Identifiable, Equatable, Sendable {
     var payload: ClipPayload
     var capturedAt: Date
     var isPinned: Bool
+    var sourceBundleIdentifier: String?
 
-    init(id: UUID = UUID(), payload: ClipPayload, capturedAt: Date = .now, isPinned: Bool = false) {
+    init(id: UUID = UUID(), payload: ClipPayload, capturedAt: Date = .now, isPinned: Bool = false, sourceBundleIdentifier: String? = nil) {
         self.id = id
         self.payload = payload
         self.capturedAt = capturedAt
         self.isPinned = isPinned
+        self.sourceBundleIdentifier = sourceBundleIdentifier
     }
 }

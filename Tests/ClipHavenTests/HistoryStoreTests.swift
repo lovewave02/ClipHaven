@@ -1,3 +1,4 @@
+import Carbon.HIToolbox
 import Foundation
 import Testing
 @testable import ClipHaven
@@ -46,6 +47,15 @@ struct HistoryStoreTests {
         #expect(history.items.isEmpty)
     }
 
+    @Test func autoPasteDefaultsOffAndPersistsWhenExplicitlyEnabled() {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let history = HistoryStore(persistence: HistoryPersistence(url: url))
+        #expect(!history.settings.autoPaste)
+        history.setAutoPaste(true)
+        let restored = HistoryStore(persistence: HistoryPersistence(url: url))
+        #expect(restored.settings.autoPaste)
+    }
+
     @Test func clearUnpinnedLeavesPinnedAndClearAllRemovesEverything() {
         let history = store()
         history.capture(.text("keep")); history.togglePin(history.items[0].id)
@@ -54,5 +64,18 @@ struct HistoryStoreTests {
         #expect(history.items.map(\.payload.preview) == ["keep"])
         history.clearAll()
         #expect(history.items.isEmpty)
+    }
+
+    @Test func globalShortcutIsCommandOptionSpace() {
+        #expect(GlobalShortcutConfiguration.keyCode == 49)
+        #expect(GlobalShortcutConfiguration.modifiers == UInt32(cmdKey | optionKey))
+        #expect(GlobalShortcutRegistration.registered.diagnostic.contains("registered"))
+    }
+
+    @Test func globalShortcutMatcherConsumesOnlyCommandOptionSpace() {
+        #expect(GlobalShortcutConfiguration.matches(keyCode: 49, flags: [.maskCommand, .maskAlternate]))
+        #expect(!GlobalShortcutConfiguration.matches(keyCode: 49, flags: [.maskCommand]))
+        #expect(!GlobalShortcutConfiguration.matches(keyCode: 49, flags: [.maskCommand, .maskAlternate, .maskShift]))
+        #expect(!GlobalShortcutConfiguration.matches(keyCode: 0, flags: [.maskCommand, .maskAlternate]))
     }
 }
